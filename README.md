@@ -1,8 +1,8 @@
-# ElectroMart 🛒
-**Enterprise E-Commerce Web Application**
+# ElectroMart
+Enterprise E-Commerce Web Application
 
 > Final Course Project – Java Full Stack Development  
-> Submitted by: Nagesh Babu | AchieversIT, Bengaluru  
+> Submitted by: Otooru Baba | AchieversIT, Bengaluru  
 > Stack: React JS | Spring Boot | MySQL
 
 ---

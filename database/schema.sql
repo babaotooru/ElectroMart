@@ -1,12 +1,5 @@
--- ============================================================
---  ElectroMart - MySQL Database Schema
---  Technology: MySQL 8.x
--- ============================================================
 
-CREATE DATABASE IF NOT EXISTS electromart_db;
-USE electromart_db;
-
--- ─── USERS ────────────────────────────────────────────────────
+---- USERS ----
 CREATE TABLE IF NOT EXISTS users (
     id          BIGINT          NOT NULL AUTO_INCREMENT PRIMARY KEY,
     full_name   VARCHAR(100)    NOT NULL,
@@ -19,7 +12,7 @@ CREATE TABLE IF NOT EXISTS users (
     updated_at  DATETIME        DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- ─── PRODUCTS ─────────────────────────────────────────────────
+---- PRODUCTS ----
 CREATE TABLE IF NOT EXISTS products (
     id              BIGINT          NOT NULL AUTO_INCREMENT PRIMARY KEY,
     name            VARCHAR(200)    NOT NULL,
@@ -34,7 +27,7 @@ CREATE TABLE IF NOT EXISTS products (
     updated_at      DATETIME        DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- ─── CART ITEMS ───────────────────────────────────────────────
+---- CART ITEMS ---
 CREATE TABLE IF NOT EXISTS cart_items (
     id          BIGINT  NOT NULL AUTO_INCREMENT PRIMARY KEY,
     user_id     BIGINT  NOT NULL,
@@ -46,7 +39,7 @@ CREATE TABLE IF NOT EXISTS cart_items (
     UNIQUE KEY uq_user_product (user_id, product_id)
 );
 
--- ─── SEED DATA ────────────────────────────────────────────────
+---- SEED DATA ---
 -- Default Admin (password: admin123)
 INSERT INTO users (full_name, email, password, role) VALUES
 ('swarupa', 'admin@electromart.com',
