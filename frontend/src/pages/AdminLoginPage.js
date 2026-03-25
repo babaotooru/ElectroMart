@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { loginAdmin, registerAdmin } from '../services/api';
 
 export default function AdminLoginPage() {
   const [isSignup, setIsSignup] = useState(false);
@@ -15,14 +16,25 @@ export default function AdminLoginPage() {
     e.preventDefault();
     setError('');
     try {
-      // Demo mode: accept any credentials
-      const mockAdmin = {
-        userId: 99,
-        fullName: form.fullName || 'swarupa',
-        email: form.email,
-        role: 'ADMIN'
+      const res = isSignup
+        ? await registerAdmin({
+            fullName: form.fullName,
+            email: form.email,
+            password: form.password,
+            phone: '',
+            address: '',
+          })
+        : await loginAdmin({ email: form.email, password: form.password });
+
+      const authUser = {
+        id: res.data.userId,
+        userId: res.data.userId,
+        fullName: res.data.fullName,
+        email: res.data.email,
+        role: res.data.role,
       };
-      login(mockAdmin, 'mock-jwt-token-admin');
+
+      login(authUser, res.data.token);
       navigate('/admin/dashboard');
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed.');

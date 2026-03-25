@@ -1,20 +1,47 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Toast from '../components/Toast';
+import { getUserProfile, updateUserProfile } from '../services/api';
 
 export default function UserProfilePage({ darkMode, toggleDark }) {
-  const { user, cartCount } = useAuth();
+  const { user, updateUser, cartCount } = useAuth();
   const [form, setForm] = useState({
     fullName: user?.fullName || '',
     email: user?.email || '',
-    role: 'user',
+    phone: user?.phone || '',
+    address: user?.address || '',
+    role: (user?.role || 'USER').toLowerCase(),
+    password: '',
     avatarUrl: null,
   });
+  const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState(null);
 
   const handleChange = e => setForm(f => ({ ...f, [e.target.name]: e.target.value }));
+
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const loadProfile = async () => {
+      try {
+        const { data } = await getUserProfile(user.id);
+        setForm(f => ({
+          ...f,
+          fullName: data.fullName || '',
+          email: data.email || '',
+          phone: data.phone || '',
+          address: data.address || '',
+          role: (data.role || 'USER').toLowerCase(),
+        }));
+      } catch {
+        setToast({ message: 'Failed to load profile', type: 'error' });
+      }
+    };
+
+    loadProfile();
+  }, [user?.id]);
 
   const handleAvatarChange = e => {
     if (e.target.files[0]) {
@@ -23,10 +50,32 @@ export default function UserProfilePage({ darkMode, toggleDark }) {
     }
   };
 
-  const handleSave = e => {
+  const handleSave = async e => {
     e.preventDefault();
-    // In real app: call API to update profile
-    setToast({ message: 'Profile saved successfully!', type: 'success' });
+    if (!user?.id) {
+      setToast({ message: 'User session not found. Please login again.', type: 'error' });
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const payload = {
+        fullName: form.fullName,
+        phone: form.phone,
+        address: form.address,
+      };
+
+      if (form.password.trim()) payload.password = form.password.trim();
+
+      await updateUserProfile(user.id, payload);
+      updateUser({ fullName: form.fullName, phone: form.phone, address: form.address });
+      setForm(f => ({ ...f, password: '' }));
+      setToast({ message: 'Profile saved successfully!', type: 'success' });
+    } catch {
+      setToast({ message: 'Failed to save profile', type: 'error' });
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -86,7 +135,37 @@ export default function UserProfilePage({ darkMode, toggleDark }) {
                 style={{ background: '#f8fafc', color: '#94a3b8' }}
               />
             </div>
-            <button type="submit" className="btn-save-profile">Save Profile</button>
+            <div className="form-group">
+              <input
+                className="form-control"
+                name="phone"
+                value={form.phone}
+                onChange={handleChange}
+                placeholder="Phone"
+              />
+            </div>
+            <div className="form-group">
+              <input
+                className="form-control"
+                name="address"
+                value={form.address}
+                onChange={handleChange}
+                placeholder="Address"
+              />
+            </div>
+            <div className="form-group">
+              <input
+                className="form-control"
+                name="password"
+                value={form.password}
+                onChange={handleChange}
+                placeholder="New Password (optional)"
+                type="password"
+              />
+            </div>
+            <button type="submit" className="btn-save-profile" disabled={saving}>
+              {saving ? 'Saving...' : 'Save Profile'}
+            </button>
           </form>
         </div>
       </div>

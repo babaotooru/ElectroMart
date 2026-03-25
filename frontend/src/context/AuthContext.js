@@ -17,10 +17,24 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = (userData, authToken) => {
-    setUser(userData);
+    const normalizedUser = {
+      ...userData,
+      id: userData?.id ?? userData?.userId ?? null,
+      userId: userData?.userId ?? userData?.id ?? null,
+    };
+
+    setUser(normalizedUser);
     setToken(authToken);
     localStorage.setItem('em_token', authToken);
-    localStorage.setItem('em_user', JSON.stringify(userData));
+    localStorage.setItem('em_user', JSON.stringify(normalizedUser));
+  };
+
+  const updateUser = (partialUserData) => {
+    setUser(prev => {
+      const next = { ...(prev || {}), ...partialUserData };
+      localStorage.setItem('em_user', JSON.stringify(next));
+      return next;
+    });
   };
 
   const logout = () => {
@@ -32,7 +46,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, cartCount, setCartCount }}>
+    <AuthContext.Provider value={{ user, token, login, logout, updateUser, cartCount, setCartCount }}>
       {children}
     </AuthContext.Provider>
   );

@@ -48,11 +48,30 @@ public class ProductService {
     }
 
     public Product addProduct(String name, String description, BigDecimal price,
-                              Integer stock, String category, String brand,
-                              MultipartFile image) throws IOException {
+            Integer stock, String category, String brand,
+            MultipartFile image) throws IOException {
         String imageUrl = null;
         if (image != null && !image.isEmpty()) {
             imageUrl = saveImage(image);
+        }
+
+        String normalizedBrand = brand != null ? brand.trim() : "";
+
+        var existing = productRepository.findDuplicateProduct(name, category, normalizedBrand);
+        if (existing.isPresent()) {
+            Product product = existing.get();
+            if (description != null)
+                product.setDescription(description);
+            if (price != null)
+                product.setPrice(price);
+            if (stock != null)
+                product.setStockQuantity(stock);
+            product.setStatus(Product.Status.ACTIVE);
+            product.setBrand(normalizedBrand.isEmpty() ? null : normalizedBrand);
+            if (imageUrl != null) {
+                product.setImageUrl(imageUrl);
+            }
+            return productRepository.save(product);
         }
 
         Product product = Product.builder()
@@ -61,7 +80,7 @@ public class ProductService {
                 .price(price)
                 .stockQuantity(stock)
                 .category(category)
-                .brand(brand)
+                .brand(normalizedBrand.isEmpty() ? null : normalizedBrand)
                 .imageUrl(imageUrl)
                 .status(Product.Status.ACTIVE)
                 .build();
@@ -70,15 +89,21 @@ public class ProductService {
     }
 
     public Product updateProduct(Long id, String name, String description, BigDecimal price,
-                                  Integer stock, String category, String brand,
-                                  MultipartFile image) throws IOException {
+            Integer stock, String category, String brand,
+            MultipartFile image) throws IOException {
         Product product = getProductById(id);
-        if (name != null)        product.setName(name);
-        if (description != null) product.setDescription(description);
-        if (price != null)       product.setPrice(price);
-        if (stock != null)       product.setStockQuantity(stock);
-        if (category != null)    product.setCategory(category);
-        if (brand != null)       product.setBrand(brand);
+        if (name != null)
+            product.setName(name);
+        if (description != null)
+            product.setDescription(description);
+        if (price != null)
+            product.setPrice(price);
+        if (stock != null)
+            product.setStockQuantity(stock);
+        if (category != null)
+            product.setCategory(category);
+        if (brand != null)
+            product.setBrand(brand);
         if (image != null && !image.isEmpty()) {
             product.setImageUrl(saveImage(image));
         }

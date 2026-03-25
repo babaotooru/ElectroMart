@@ -2,34 +2,64 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
 import Toast from '../components/Toast';
+import { getCart, updateCartQty, removeFromCart } from '../services/api';
 
 export default function CartPage({ darkMode, toggleDark }) {
-  const { cartCount, setCartCount } = useAuth();
-  const [cart, setCart] = useState(() => JSON.parse(localStorage.getItem('em_cart') || '[]'));
+  const { user, cartCount, setCartCount } = useAuth();
+  const [cart, setCart] = useState([]);
   const [toast, setToast] = useState(null);
 
   useEffect(() => {
-    setCartCount(cart.length);
-    localStorage.setItem('em_cart', JSON.stringify(cart));
-  }, [cart, setCartCount]);
+    const loadCart = async () => {
+      const loggedInUserId = user?.id ?? user?.userId;
+      if (!loggedInUserId) {
+        setCart([]);
+        setCartCount(0);
+        return;
+      }
 
-  const updateQty = (id, delta) => {
-    setCart(prev =>
-      prev.map(item => {
-        if (item.id !== id) return item;
-        const newQty = item.quantity + delta;
-        if (newQty < 1) return item;
-        return { ...item, quantity: newQty };
-      })
-    );
+      try {
+        const { data } = await getCart(loggedInUserId);
+        setCart(data);
+        setCartCount(data.length);
+      } catch {
+        setToast({ message: 'Failed to load cart', type: 'error' });
+      }
+    };
+
+    loadCart();
+  }, [user?.id, user?.userId, setCartCount]);
+
+  const updateQty = async (id, delta) => {
+    const current = cart.find(item => item.id === id);
+    if (!current) return;
+
+    const newQty = current.quantity + delta;
+    if (newQty < 1) return;
+
+    try {
+      await updateCartQty(id, newQty);
+      setCart(prev => prev.map(item => item.id === id ? { ...item, quantity: newQty } : item));
+    } catch {
+      setToast({ message: 'Failed to update quantity', type: 'error' });
+    }
   };
 
-  const removeItem = (id) => {
-    setCart(prev => prev.filter(item => item.id !== id));
-    setToast({ message: 'Item removed from cart', type: 'error' });
+  const removeItem = async (id) => {
+    try {
+      await removeFromCart(id);
+      setCart(prev => {
+        const updated = prev.filter(item => item.id !== id);
+        setCartCount(updated.length);
+        return updated;
+      });
+      setToast({ message: 'Item removed from cart', type: 'error' });
+    } catch {
+      setToast({ message: 'Failed to remove item', type: 'error' });
+    }
   };
 
-  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const total = cart.reduce((sum, item) => sum + Number(item.product?.price || 0) * item.quantity, 0);
 
   return (
     <div className="cart-page">
@@ -48,8 +78,8 @@ export default function CartPage({ darkMode, toggleDark }) {
               {cart.map(item => (
                 <div className="cart-item" key={item.id}>
                   <div className="cart-item-info">
-                    <h4>{item.name}</h4>
-                    <p>₹{item.price.toLocaleString()}</p>
+                    <h4>{item.product?.name}</h4>
+                    <p>₹{Number(item.product?.price || 0).toLocaleString()}</p>
                   </div>
                   <div className="cart-item-controls">
                     <div className="qty-controls">
