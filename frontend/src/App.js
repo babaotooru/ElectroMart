@@ -13,9 +13,23 @@ import AdminProfilePage from './pages/AdminProfilePage';
 
 // Route guards
 function RequireAuth({ children, role }) {
-  const { user } = useAuth();
-  if (!user) return <Navigate to={role === 'ADMIN' ? '/admin/login' : '/login'} replace />;
-  if (role && user.role !== role) return <Navigate to="/login" replace />;
+  const { user, isInitialized } = useAuth();
+
+  // Show nothing while still initializing (prevents redirect to login during startup)
+  if (!isInitialized) {
+    return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>Loading...</div>;
+  }
+
+  // If not logged in after initialization, redirect to appropriate login page
+  if (!user) {
+    return <Navigate to={role === 'ADMIN' ? '/admin/login' : '/login'} replace />;
+  }
+
+  // If role doesn't match, redirect to login
+  if (role && user.role !== role) {
+    return <Navigate to={role === 'ADMIN' ? '/admin/login' : '/login'} replace />;
+  }
+
   return children;
 }
 
