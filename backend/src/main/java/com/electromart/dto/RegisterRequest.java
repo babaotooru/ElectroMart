@@ -8,11 +8,11 @@ import lombok.Data;
 @Data
 public class RegisterRequest {
 
-    @NotBlank(message = "Full name is Required")
+    @NotBlank(message = "Full Name is Required")
     private String fullName;
 
     @NotBlank(message = "Email is Required")
-    @Email(message = "Invalid email format")
+    @Email(message = "Invalid Email format")
     private String email;
 
     @NotBlank(message = "Password is Required")
