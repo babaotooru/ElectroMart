@@ -1,12 +1,17 @@
-FROM eclipse-temurin:17-jdk
+FROM maven:3.8.1-openjdk-17 AS builder
 
 WORKDIR /app
 
 COPY . .
 
-RUN chmod +x mvnw
-RUN ./mvnw clean package -DskipTests
+RUN mvn clean package -DskipTests
+
+FROM eclipse-temurin:17-jdk
+
+WORKDIR /app
+
+COPY --from=builder /app/target/*.jar app.jar
 
 EXPOSE 8081
 
-CMD sh -c "java -jar target/*.jar"
+CMD ["java", "-jar", "app.jar"]
