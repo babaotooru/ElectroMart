@@ -87,7 +87,6 @@ export default function AdminDashboard({ darkMode, toggleDark }) {
           Welcome, <span>{user?.fullName || 'Admin'}</span>
         </h2>
 
-        {/* Add Product Form */}
         <div className="add-product-card">
           <h3>Add Product</h3>
           <form onSubmit={handleAddProduct}>

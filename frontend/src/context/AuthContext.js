@@ -8,7 +8,6 @@ export const AuthProvider = ({ children }) => {
   const [cartCount, setCartCount] = useState(0);
   const [isInitialized, setIsInitialized] = useState(false);
 
-  // Read persisted auth from localStorage when component mounts
   useEffect(() => {
     const savedToken = localStorage.getItem('em_token');
     const savedUser = localStorage.getItem('em_user');
@@ -22,7 +21,6 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem('em_user');
       }
     }
-    // Mark initialization as complete regardless of whether we found saved data
     setIsInitialized(true);
   }, []);
 
