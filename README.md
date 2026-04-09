@@ -228,6 +228,22 @@ Spring Boot Backend (Port 8080)
 | Frontend  | Netlify / Vercel / GitHub Pages |
 | Database  | PlanetScale / AWS RDS / Local   |
 
+### Render (Backend) Quick Setup
+
+If deploying the Spring Boot backend on Render Web Service, add these environment variables:
+
+- `DB_URL`
+- `DB_USERNAME`
+- `DB_PASSWORD`
+- `JWT_SECRET`
+- `APP_CORS_ALLOWED_ORIGINS` (comma-separated frontend URLs)
+
+Notes:
+
+- The app binds to Render's runtime port using `server.port=${PORT:8080}`.
+- Do not use `localhost` in `DB_URL` on Render; use your managed MySQL host.
+- Sample values are available in `backend/.env.render.example`.
+
 ```bash
 # Build frontend for production
 cd frontend && npm run build
