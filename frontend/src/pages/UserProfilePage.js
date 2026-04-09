@@ -113,7 +113,7 @@ export default function UserProfilePage({ darkMode, toggleDark }) {
                 value={form.fullName}
                 onChange={handleChange}
                 placeholder="Full Name"
-                style={{ background: '#e3e3e8' }}
+                style={{ background: '#e3e3e8', color: '#000'}}
               />
             </div>
             <div className="form-group">
@@ -132,7 +132,7 @@ export default function UserProfilePage({ darkMode, toggleDark }) {
                 name="role"
                 value={form.role}
                 readOnly
-                style={{ background: '#e3e3e8', color: '#94a3b8' }}
+                style={{ background: '#e3e3e8', color: '#000' }}
               />
             </div>
             <div className="form-group">
