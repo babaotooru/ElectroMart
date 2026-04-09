@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8081/api';
+const BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080/api';
+const API_ORIGIN = new URL(BASE_URL).origin;
 
 const api = axios.create({ baseURL: BASE_URL });
 
@@ -40,3 +41,4 @@ export const getUserProfile    = userId => api.get(`/users/${userId}`);
 export const updateUserProfile = (userId, data) => api.put(`/users/${userId}`, data);
 
 export default api;
+export { API_ORIGIN };

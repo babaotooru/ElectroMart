@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Toast from '../components/Toast';
-import { addToCart, getCart, getProducts } from '../services/api';
+import { API_ORIGIN, addToCart, getCart, getProducts } from '../services/api';
 
 // Category icons
 const icons = {
@@ -31,7 +31,7 @@ export default function UserDashboard({ darkMode, toggleDark }) {
   const toAbsoluteImageUrl = (imageUrl) => {
     if (!imageUrl) return 'https://via.placeholder.com/300x150?text=No+Image';
     if (imageUrl.startsWith('/api/')) {
-      return `http://localhost:8081${imageUrl}`;
+      return `${API_ORIGIN}${imageUrl}`;
     }
     return imageUrl;
   };
