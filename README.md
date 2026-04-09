@@ -238,6 +238,8 @@ If deploying the Spring Boot backend on Render Web Service, add these environmen
 - `JWT_SECRET`
 - `APP_CORS_ALLOWED_ORIGINS` (comma-separated frontend URLs)
 
+For the current deployment, include `https://electro-mart-three.vercel.app` in `APP_CORS_ALLOWED_ORIGINS`, and make sure the frontend API base URL ends with `/api`.
+
 Notes:
 
 - The app binds to Render's runtime port using `server.port=${PORT:8080}`.
