@@ -3,7 +3,7 @@ Enterprise E-Commerce Web Application
 
 > Final Course Project – Java Full Stack Development  
 > Submitted by: Otooru Baba | AchieversIT, Bengaluru  
-> Stack: React JS | Spring Boot | MySQL
+> Stack: React JS | Spring Boot | Supabase PostgreSQL
 
 ---
 
@@ -81,7 +81,7 @@ electromart/
 |-------------|----------------------------------------|
 | Frontend    | React JS 18, React Router v6, Axios    |
 | Backend     | Spring Boot 3.2, Spring Security, JPA  |
-| Database    | MySQL 8.x                              |
+| Database    | Supabase PostgreSQL                    |
 | ORM         | Spring Data JPA + Hibernate            |
 | Security    | JWT (jjwt), BCrypt password encryption |
 | Build Tool  | Maven (backend), npm (frontend)        |
@@ -90,23 +90,20 @@ electromart/
 
 ## 🚀 Setup & Run Instructions
 
-### 1. MySQL Database Setup
+### 1. Supabase Database Setup
 
-```bash
-# Login to MySQL
-mysql -u root -p
-
-# Run the schema
-SOURCE /path/to/electromart/database/schema.sql;
-```
+Create the tables in your Supabase Postgres database using [database/schema.sql](database/schema.sql).
 
 ### 2. Backend – Spring Boot
 
-**Configure DB credentials** in `backend/src/main/resources/application.properties`:
+**Configure DB credentials** in Render or your local `.env`:
 ```properties
-spring.datasource.username=root
-spring.datasource.password=YOUR_PASSWORD
+SPRING_DATASOURCE_URL=jdbc:postgresql://db.ggbuxhwzzatrmxcwgqev.supabase.co:5432/postgres?sslmode=require
+SPRING_DATASOURCE_USERNAME=postgres
+SPRING_DATASOURCE_PASSWORD=YOUR_SUPABASE_DB_PASSWORD
 ```
+
+If you use the Supabase connection string directly, keep the password URL-encoded or, preferably, pass username and password separately as environment variables.
 
 **Run the application:**
 ```bash

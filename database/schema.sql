@@ -1,22 +1,20 @@
 
-USE railway;
-
 -- USERS
 CREATE TABLE IF NOT EXISTS users (
-    id          BIGINT          NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    id          BIGSERIAL       PRIMARY KEY,
     full_name   VARCHAR(100)    NOT NULL,
     email       VARCHAR(150)    NOT NULL UNIQUE,
     password    VARCHAR(255)    NOT NULL,
-    role        ENUM('USER','ADMIN') NOT NULL DEFAULT 'USER',
+    role        VARCHAR(20)     NOT NULL DEFAULT 'USER',
     phone       VARCHAR(20),
     address     TEXT,
-    created_at  DATETIME        DEFAULT CURRENT_TIMESTAMP,
-    updated_at  DATETIME        DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    created_at  TIMESTAMP       DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMP       DEFAULT CURRENT_TIMESTAMP
 );
 
 -- PRODUCTS
 CREATE TABLE IF NOT EXISTS products (
-    id              BIGINT          NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    id              BIGSERIAL       PRIMARY KEY,
     name            VARCHAR(200)    NOT NULL,
     description     TEXT,
     price           DECIMAL(10,2)   NOT NULL,
@@ -24,30 +22,31 @@ CREATE TABLE IF NOT EXISTS products (
     category        VARCHAR(100)    NOT NULL,
     brand           VARCHAR(100),
     image_url       VARCHAR(500),
-    status          ENUM('ACTIVE','INACTIVE') NOT NULL DEFAULT 'ACTIVE',
-    created_at      DATETIME        DEFAULT CURRENT_TIMESTAMP,
-    updated_at      DATETIME        DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    UNIQUE KEY uq_product_identity (name, category, brand)
+    status          VARCHAR(20)     NOT NULL DEFAULT 'ACTIVE',
+    created_at      TIMESTAMP       DEFAULT CURRENT_TIMESTAMP,
+    updated_at      TIMESTAMP       DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uq_product_identity UNIQUE (name, category, brand)
 );
 
 -- CART ITEMS
 CREATE TABLE IF NOT EXISTS cart_items (
-    id          BIGINT  NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    id          BIGSERIAL PRIMARY KEY,
     user_id     BIGINT  NOT NULL,
     product_id  BIGINT  NOT NULL,
     quantity    INT     NOT NULL DEFAULT 1,
-    added_at    DATETIME DEFAULT CURRENT_TIMESTAMP,
+    added_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_cart_user    FOREIGN KEY (user_id)    REFERENCES users(id)    ON DELETE CASCADE,
     CONSTRAINT fk_cart_product FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
-    UNIQUE KEY uq_user_product (user_id, product_id)
+    CONSTRAINT uq_user_product UNIQUE (user_id, product_id)
 );
 
 -- SEED DATA
 -- Default Admin (password: admin123)
-INSERT INTO users (full_name, email, password, role) VALUES
+INSERT INTO users (full_name, email, password, role)
+VALUES
 ('swarupa', 'admin@electromart.com',
  '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2uheWG/igi.', 'ADMIN')
-ON DUPLICATE KEY UPDATE id = id;
+ON CONFLICT (email) DO NOTHING;
 
 -- Sample Products
 INSERT INTO products (name, description, price, stock_quantity, category, brand, image_url)
